@@ -1,6 +1,8 @@
 package org.factoriaf5.techcamps.services;
 
 import java.util.List;
+
+import org.factoriaf5.techcamps.dtos.CountryDto;
 import org.factoriaf5.techcamps.models.Country;
 import org.factoriaf5.techcamps.repositories.CountryRepository;
 import org.springframework.stereotype.Service;
@@ -17,5 +19,12 @@ public class CountryService {
 
     public List<Country> findAll() {
         return repository.findAll();
+    }
+
+    public Country save(CountryDto countryDto) {
+
+        Country country = new Country(countryDto.name());
+        repository.save(country);
+        return country;
     }
 }

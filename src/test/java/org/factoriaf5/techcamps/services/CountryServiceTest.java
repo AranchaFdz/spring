@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.factoriaf5.techcamps.dtos.CountryDto;
 import org.factoriaf5.techcamps.models.Country;
 import org.factoriaf5.techcamps.repositories.CountryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 public class CountryServiceTest {
@@ -43,11 +46,29 @@ public class CountryServiceTest {
         countries.add(australia);
         // When
         when(repository.findAll()).thenReturn(countries);
-        List<Country> list = service.findAll();
+        List<Country> list = service.findAll(); // Unit test
 
         // Then
         assertThat(list.size(), equalTo(2));
         assertThat(list.get(0).getName(), is("Spain"));
         assertThat(list.get(1).getName(), is("Australia"));
+    }
+
+    @Test
+    void testSave() {
+
+        // Given
+        CountryDto dto = new CountryDto("France");
+        Country france = new Country(2L, "America");
+
+        // When
+        when(repository.save(Mockito.any(Country.class))).thenReturn(france);
+        Country country = service.save(dto);
+
+        // Then
+        //assertThat(country.getId(), equalTo(1L));
+        assertThat(country, is(instanceOf(Country.class)));
+        assertThat(country.getName(), equalTo("France"));
+        
     }
 }

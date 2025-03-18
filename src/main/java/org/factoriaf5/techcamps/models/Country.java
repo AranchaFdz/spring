@@ -8,17 +8,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "countries")
+@Table(name = "countries") // simepre en plural
 public class Country {
 
     @Id 
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_county")
+    @Column(name = "id_county") // Primary Key
     private Long id;
     private String name; 
 
-    
     public Country() {
+    }
+
+    public Country(String name) {
+        this.name = name;
     }
 
     public Country(Long id, String name) {

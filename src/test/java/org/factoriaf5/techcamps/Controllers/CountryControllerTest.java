@@ -12,10 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.factoriaf5.techcamps.dtos.CountryDto;
 import org.factoriaf5.techcamps.models.Country;
 import org.factoriaf5.techcamps.services.CountryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -63,7 +66,7 @@ public class CountryControllerTest {
       .andReturn()
       .getResponse();
 
-    // System.out.println(response.getContentAsString()); 
+    //System.out.println(response.getContentAsString()); 
     //System.out.println(mapper.writeValueAsString(countries)); 
     // Then
     assertThat(response.getStatus(), is(200));
@@ -74,4 +77,34 @@ public class CountryControllerTest {
     //[{"id":1,"name":"Spain"},{"id":2,"name":"Australia"}]
     //"[{\"id\":1,\"name\":\"Spain\"},{\"id\":2,\"name\":\"Australia\"}]"
   }
+
+  @Test
+  @DisplayName("should store a country")
+  void testStoreCountry() throws Exception {
+    
+    // Given
+    Country country = new Country(1L, "New Zealand");
+    String json = mapper.writeValueAsString(country);
+
+    // When
+    when(service.save(Mockito.any(CountryDto.class))).thenReturn(country);
+    MockHttpServletResponse response = mockMvc.perform(post("/api/v1/countries")
+      .accept(MediaType.APPLICATION_JSON)
+      .contentType(MediaType.APPLICATION_JSON)
+      .content(json))
+      .andExpect(status().isCreated())
+      .andReturn()
+      .getResponse();
+
+    // Then
+    assertThat(response.getStatus(), is(201));
+    assertThat(response.getContentAsString(), containsString(json));
+    
+  }
+
 }
+
+  
+
+  
+
