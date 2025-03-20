@@ -2,11 +2,14 @@ package org.factoriaf5.techcamps.services;
 
 import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.factoriaf5.techcamps.dtos.CountryDto;
+import org.factoriaf5.techcamps.exceptions.country.CountryNotFoundException;
 import org.factoriaf5.techcamps.models.Country;
 import org.factoriaf5.techcamps.repositories.CountryRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,14 +24,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class CountryServiceTest {
 
     @InjectMocks
-    CountryService service;
+    CountryServiceImpl service;
 
     @Mock
     CountryRepository repository;
 
     @BeforeEach
     void setUp() {
-        this.service = new CountryService(repository);
+        this.service = new CountryServiceImpl(repository);
     }
     @Test
     @DisplayName("Return all countries")
@@ -70,5 +73,35 @@ public class CountryServiceTest {
         assertThat(country, is(instanceOf(Country.class)));
         assertThat(country.getName(), equalTo("France"));
         
+    }
+
+    @Test
+    @DisplayName("Should return a concret country using Id")
+    void testGetById() {
+        
+        Country spain = new Country(3L, "Spain");
+
+        when(repository.findById(spain.getId())).thenReturn(Optional.of(spain));
+        Country country = service.getById(spain.getId());
+
+        assertThat(country, instanceOf(Country.class));
+        assertThat(country.getId(), is(spain.getId()));
+        assertThat(country.getName(), is(spain.getName()));
+        assertThat(country, is(equalToObject(spain)));
+    }
+
+    @Test
+    @DisplayName("If country does not exist should return CountryNotFoundException")
+    void testCountryNotFound() {
+
+        String expected = "Country not found by id";
+        
+        CountryNotFoundException exception = assertThrows(CountryNotFoundException.class, () -> {
+            service.getById(1L);
+        });
+
+        String msg = exception.getMessage();
+
+        assertThat(msg, is(expected));
     }
 }

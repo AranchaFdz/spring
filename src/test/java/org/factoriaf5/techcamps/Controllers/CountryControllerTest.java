@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.factoriaf5.techcamps.dtos.CountryDto;
 import org.factoriaf5.techcamps.models.Country;
-import org.factoriaf5.techcamps.services.CountryService;
+import org.factoriaf5.techcamps.services.CountryServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,7 +35,7 @@ public class CountryControllerTest {
   MockMvc mockMvc;
 
   @MockitoBean
-  CountryService service;
+  CountryServiceImpl service;
 
   @Autowired
   ObjectMapper mapper;
@@ -101,6 +101,26 @@ public class CountryControllerTest {
     assertThat(response.getContentAsString(), containsString(json));
     
   }
+
+  @Test
+    @DisplayName("Should return a certin country")
+    void testFindCountryById() throws Exception {
+        
+        Country england = new Country(3L, "England");
+        String json = mapper.writeValueAsString(england);
+
+        when(service.getById(england.getId())).thenReturn(england);
+        MockHttpServletResponse response = mockMvc.perform(get("/api/v1/countries/3")
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse();
+
+        assertThat(response.getStatus(), is(200));
+        assertThat(response.getContentAsString(), containsString(england.getName()));
+        assertThat(response.getContentAsString(), containsString(json));
+    }
+    
 
 }
 
